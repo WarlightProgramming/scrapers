@@ -3,6 +3,13 @@ import string
 from decimal import Decimal
 import datetime
 
+def getPageData(func):
+    def func_wrapper(self, *args):
+        if (not(hasattr(self, 'pageData'))):
+            self.getData()
+        return func(self, *args)
+    return func_wrapper
+
 class ContentError(Exception):
     pass
 
@@ -11,21 +18,20 @@ class WLScraper(object):
     def __init__(self):
         self.baseURL = "https://www.warlight.net/"
         self.URL = self.makeURL()
-        self.pageData = list()
 
-    def getpagedata(func):
-        def func_wrapper(self, *args):
-            if (len(self.pageData) < 1):
-                self.getData()
-            return func(self, *args)
-        return func_wrapper
-
-    def makeURL(self):
-        return self.baseURL
+    def makeURL(self, **kwargs):
+        URL = self.baseURL
+        appendString = ""
+        for kwarg in kwargs:
+            appendString += "&"
+            appendString += str(kwarg)
+            appendString += str(kwargs[kwarg])
+        URL += appendString[1:]
+        return URL
 
     def getData(self):
         r = requests.get(self.URL)
-        self.pageData.append(r.text)
+        self.pageData = r.text
 
     @staticmethod
     def getValueFromBetween(text, before, after):
@@ -99,3 +105,16 @@ class WLScraper(object):
         month, day, year = (int(dateData[0]), int(dateData[1]),
                             int(dateData[2]))
         return datetime.date(year=year, month=month, day=day)
+
+    @staticmethod
+    def getDateTime(dateTimeString):
+        dateString, timeString = dateTimeString.split(" ")
+        dateData = dateString.split('/')
+        month, day, year = (int(dateData[0]), int(dateData[1]),
+                            int(dateData[2]))
+        timeData = timeString.split(':')
+        hour, minute, second = (int(timeData[0]), int(timeData[1]),
+                                int(timeData[2]))
+        return datetime.datetime(year=year, month=month, day=day,
+                                 hour=hour, minute=minute,
+                                 second=second)

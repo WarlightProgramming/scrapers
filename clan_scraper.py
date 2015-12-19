@@ -1,68 +1,58 @@
 from scraper_core import *
+import requests
 
 class ClanScraper(WLScraper):
 
     def __init__(self, clanID):
-        self.baseURL = "https://www.warlight.net/Clans/?ID="
-        self.URL = self.makeURL(clanID)
-        self.pageData = list()
-        self.playerData = list()
+        self.baseURL = "https://www.warlight.net/Clans/?"
+        self.ID = clanID
+        self.URL = self.makeURL(ID=clanID)
 
-    def makeURL(self, clanID):
-        return self.baseURL + str(clanID)
-
-    def getpagedata(func):
-        def func_wrapper(self, *args):
-            if (len(self.pageData) != 1):
-                self.getData()
-            return func(self, *args)
-        return func_wrapper
-
-    @getpagedata
+    @getPageData
     def getClanName(self):
-        page = self.pageData[0]
+        page = self.pageData
         return self.getValueFromBetween(page, "<title>", " -")
 
-    @getpagedata
+    @getPageData
     def getMemberCount(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Number of members:</font> "
         return self.getIntegerValue(page, marker)
 
-    @getpagedata
+    @getPageData
     def getLink(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = 'Link:</font> <a rel="nofollow" href="'
         end = '">'
         link = self.getValueFromBetween(page, marker, end)
         if link == "http://": return ""
         return link
 
-    @getpagedata
+    @getPageData
     def getTagline(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = 'Tagline:</font> '
         end = '<br />'
         return self.getValueFromBetween(page, marker, end)
 
-    @getpagedata
+    @getPageData
     def getCreatedDate(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Created:</font> "
         end = "<br"
         dateString = self.getValueFromBetween(page, marker, end)
         return self.getDate(dateString)
 
-    @getpagedata
+    @getPageData
     def getBio(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Bio:</font>  "
         end = "<br />"
         return self.getValueFromBetween(page, marker, end)
 
-    @getpagedata
+    @getPageData
     def getMembers(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = '<table class="dataTable">'
         end = '</table>'
         data = list()
@@ -77,3 +67,16 @@ class ClanScraper(WLScraper):
                           "</td")
             data.append((playerID, playerName, playerTitle))
         return data
+
+def getClans():
+    URL = "https://www.warlight.net/Clans/List"
+    r = requests.get(URL)
+    clanSet = set()
+    clanData = r.text.split("/Clans/?ID=")[1:]
+    for clan in clanData:
+        clanID = ""
+        while clan[0] in string.digits:
+            clanID += clan[0]
+            clan = clan[1:]
+        clanSet.add(int(clanID))
+    return clanSet

@@ -3,86 +3,75 @@ from scraper_core import *
 class PlayerScraper(WLScraper):
 
     def __init__(self, playerID):
-        self.baseURL = "https://www.warlight.net/Profile?p="
-        self.URL = self.makeURL(playerID)
-        self.pageData = list()
-        self.playerData = dict()
+        self.baseURL = "https://www.warlight.net/Profile?"
+        self.ID = playerID
+        self.URL = self.makeURL(p=playerID)
 
-    def makeURL(self, playerID):
-        return self.baseURL + str(playerID)
-
-    def getpagedata(func):
-        def func_wrapper(self, *args):
-            if (len(self.pageData) != 1):
-                self.getData()
-            return func(self, *args)
-        return func_wrapper
-
-    @getpagedata
+    @getPageData
     def getClanID(self):
-        page = self.pageData[0]
+        page = self.pageData
         return self.getIntegerValue(page, '<a href="/Clans/?ID=')
 
-    @getpagedata
+    @getPageData
     def getClanName(self):
-        page = self.pageData[0]
+        page = self.pageData
         return self.getLetterValue(page, 'border="0" />')
 
-    @getpagedata
+    @getPageData
     def getPlayerName(self):
-        page = self.pageData[0]
+        page = self.pageData
         return self.getLetterValue(page, '<title>')
 
-    @getpagedata
+    @getPageData
     def getMemberStatus(self):
-        page = self.pageData[0]
+        page = self.pageData
         memberString = 'id="MemberIcon" title="WarLight Member"'
         return (memberString in page)
 
-    @getpagedata
+    @getPageData
     def getLevel(self):
-        page = self.pageData[0]
+        page = self.pageData
         return self.getIntegerValue(page, '<big><b>Level ')
 
-    @getpagedata
+    @getPageData
     def getPoints(self):
-        page = self.pageData[0]
+        page = self.pageData
         points = self.getTypedValue(page, 'days:</font> ',
                                     (string.digits + ","))
         return int(points.replace(",",""))
 
-    @getpagedata
+    @getPageData
     def getEmail(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "E-mail:</font> "
         end = "<br />"
         return self.getValueFromBetween(page, marker, end)
 
-    @getpagedata
+    @getPageData
     def getLink(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Player-supplied link:"
         end = "</a>"
         dataRange = self.getValueFromBetween(page, marker, end)
         return self.getValueFromBetween(dataRange, '">', None)
 
-    @getpagedata
+    @getPageData
     def getTagline(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Tagline:</font> "
         end = "<br />"
         return self.getValueFromBetween(page, marker, end)
 
-    @getpagedata
+    @getPageData
     def getBio(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Bio:</font>  "
         end = "<br />"
         return self.getValueFromBetween(page, marker, end)
 
-    @getpagedata
+    @getPageData
     def getJoinString(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Joined WarLight:</font> "
         end = "<br />"
         return self.getValueFromBetween(page, marker, end)
@@ -90,9 +79,9 @@ class PlayerScraper(WLScraper):
     def getJoinDate(self):
         return self.getDate(self.getJoinString())
 
-    @getpagedata
+    @getPageData
     def getMemberString(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Member since</font> "
         end = "</font>"
         if marker not in page: return ""
@@ -103,52 +92,52 @@ class PlayerScraper(WLScraper):
         if memberString == "": return None
         return self.getDate(memberString)
 
-    @getpagedata
+    @getPageData
     def getCurrentGames(self):
-        page = self.pageData[0]
+        page = self.pageData
         dataRange = self.getValueFromBetween(page, 
                     "Currently in</font> ", "games")
         if "multi-day" not in dataRange: return 0
         return self.getIntegerValue(dataRange, "")
 
-    @getpagedata
+    @getPageData
     def getPlayedGames(self):
-        page = self.pageData[0]
+        page = self.pageData
         return self.getIntegerValue(page, "Played in</font> ")
 
-    @getpagedata
+    @getPageData
     def getPercentRT(self):
-        page = self.pageData[0]
+        page = self.pageData
         dataRange = self.getValueFromBetween(page, "Played in",
                                              "<br />")
         return self.getNumericValue(dataRange, " (")
 
-    @getpagedata
+    @getPageData
     def getLastSeen(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "Last seen </font>"
         end = "<font"
         return self.timeConvert(self.getValueFromBetween(page,
                                 marker, end))
 
-    @getpagedata
+    @getPageData
     def getBootCount(self):
-        page = self.pageData[0]
+        page = self.pageData
         if "never been booted" in page: return 0
         marker = "This player has been booted "
         return self.getIntegerValue(page, marker)
 
-    @getpagedata
+    @getPageData
     def getBootRate(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "This player has been booted "
         end = "</font>"
         dataRange = self.getValueFromBetween(page, marker, end)
         return self.getNumericValue(dataRange, " (")
 
-    @getpagedata
+    @getPageData
     def getFavoriteGames(self):
-        page = self.pageData[0]
+        page = self.pageData
         data = list()
         marker = "<h3>Favorite Games</h3>"
         if marker not in page: return data
@@ -163,9 +152,9 @@ class PlayerScraper(WLScraper):
             data.append(gameData)
         return data
 
-    @getpagedata
+    @getPageData
     def getSingleStats(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "<h3>Single-player stats</h3>"
         data = dict()
         if marker not in page: return data
@@ -178,9 +167,9 @@ class PlayerScraper(WLScraper):
             data[levelName] = levelTurns
         return data
 
-    @getpagedata
+    @getPageData
     def getTournaments(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "<h3>Tournaments</h3>"
         data = list()
         if marker not in page: return data
@@ -195,9 +184,9 @@ class PlayerScraper(WLScraper):
             data.append((tourneyID, tourneyName, rank))
         return data
 
-    @getpagedata
+    @getPageData
     def getLadderData(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "<h3>Ladder Statistics</h3>"
         data = dict()
         if marker not in page: return data
@@ -223,9 +212,9 @@ class PlayerScraper(WLScraper):
                                 peakRank, peakRating)
         return data
 
-    @getpagedata
+    @getPageData
     def getRankedData(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "<h3>Ranked Games</h3>"
         data = dict()
         if marker not in page: return data, 0, 0, 0.0
@@ -250,9 +239,9 @@ class PlayerScraper(WLScraper):
             data[gameType] = (gamesWon, gamesPlayed, winPercent)
         return data, rankedWins, rankedCount, rankedPercent
 
-    @getpagedata
+    @getPageData
     def getPreviousNames(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "<h3>Previously known as..."
         data = list()
         if marker not in page: return data
@@ -266,9 +255,9 @@ class PlayerScraper(WLScraper):
             data.append((name, until))
         return data
 
-    @getpagedata
+    @getPageData
     def getPlaySpeed(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "<h3>Play Speed</h3>"
         data = dict()
         if marker not in page: return data
@@ -283,9 +272,9 @@ class PlayerScraper(WLScraper):
             data[typeMarker] = avgTime
         return data
 
-    @getpagedata
+    @getPageData
     def getFavoriteMaps(self):
-        page = self.pageData[0]
+        page = self.pageData
         baseURL = "https://warlight.net"
         marker = "Favorite Maps</h3"
         data = list()
@@ -302,9 +291,9 @@ class PlayerScraper(WLScraper):
             data.append((name, author, link))
         return data
 
-    @getpagedata
+    @getPageData
     def getAchievementRate(self):
-        page = self.pageData[0]
+        page = self.pageData
         marker = "<h3>Achievements"
         if marker not in page: return 0
         dataRange = self.getValueFromBetween(page, marker, 
