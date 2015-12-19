@@ -219,15 +219,20 @@ class PlayerScraper(WLScraper):
         data = dict()
         if marker not in page: return data, 0, 0, 0.0
         dataRange = self.getValueFromBetween(page, marker, "<h3")
+        if "No completed ranked games" in dataRange:
+            return data, 0, 0, 0.0
         rankedCount = self.getIntegerValue(dataRange,
                       "Completed</font> ")
-        rankedWins = self.getIntegerValue(dataRange,
-                     "ranked games (")
+        if "ranked games (" in dataRange:
+            rankedWins = self.getIntegerValue(dataRange,
+                         "ranked games (")
+        else:
+            rankedWins = self.getIntegerValue(dataRange,
+                         "ranked game (")
         rankedPercent = Decimal(rankedWins) / Decimal(rankedCount)
         rankedPercent = float(rankedPercent * Decimal(100))
         dataSet = dataRange.split('color="#858585"')[2:]
         for dataPoint in dataSet:
-            print dataPoint
             gameType = self.getValueFromBetween(dataPoint,
                        '>', ':</font')
             gamesWon = self.getIntegerValue(dataPoint,
@@ -282,7 +287,6 @@ class PlayerScraper(WLScraper):
         dataRange = self.getValueFromBetween(page, marker, "</td")
         dataSet = dataRange.split('a href="')[1:]
         for dataPoint in dataSet:
-            print dataPoint
             link = self.getValueFromBetween(dataPoint, '', '">')
             name = self.getValueFromBetween(dataPoint, 
                    "</a> <br>", "<br>")

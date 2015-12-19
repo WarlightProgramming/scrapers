@@ -25,17 +25,23 @@ class WLScraper(object):
         for kwarg in kwargs:
             appendString += "&"
             appendString += str(kwarg)
+            appendString += "="
             appendString += str(kwargs[kwarg])
         URL += appendString[1:]
         return URL
 
-    def getData(self):
-        r = requests.get(self.URL)
+    def getData(self, loop=True):
+        stop = False
+        while (not stop):
+            try:
+                r = requests.get(self.URL)
+                stop = True
+            except:
+                if (not loop): stop = True
         self.pageData = r.text
 
     @staticmethod
     def getValueFromBetween(text, before, after):
-        print text, before, after
         if before is None: before = ""
         if after is None: after = ""
         if (before not in text or after not in text):
