@@ -39,15 +39,6 @@ class LadderRankingScraper(WLScraper):
     def __init__(self, ladderID, offset):
         self.baseURL = "https://www.warlight.net/LadderTeams?"
         self.URL = self.makeURL(ID=ladderID, Offset=offset)
-
-    @staticmethod
-    def getClan(player):
-        clanMarker = "/Clans/?ID="
-        if clanMarker not in player:
-            return None, ""
-        clanID = self.getIntegerValue(player, clanMarker)
-        clanName = self.getValueFromBetween(player, '" title=',
-                                            '">')
         self.hasUnranked = False
         self.isEmpty = False
 
@@ -76,15 +67,30 @@ class LadderRankingScraper(WLScraper):
             teamID = self.getIntegerValue(dataPoint, teamMarker)
             teamIDString = teamMarker + str(teamID)
             players = list()
-            playerList = dataPoint.split(" and ")
-            for player in playerList:
-                clanID, clanName = self.getClan(player)
-                nameMarker = teamIDString + '">'
-                playerName = self.getValueFromBetween(nameMarker,
-                             "</a>")
-                players.append(playerName, (clanID, clanName))
+            dataList = dataPoint.split("<a ")
+            currentClanID, currentClanName = None, ""
+            clanIDMarker = '"/Clans/?ID='
+            clanNameMarker = '" title="'
+            clanNameEnd = '">'
+            nameMarker = teamIDString + '">'
+            nameEnd = '</a'
+            for dataUnit in dataList:
+                if clanIDMarker in dataUnit and clanNameMarker in dataUnit:
+                    currentClanID = self.getIntegerValue(dataUnit, clanIDMarker)
+                    currentClanName = self.getValueFromBetween(dataUnit,
+                                      clanNameMarker, clanNameEnd)
+                else:
+                    playerName = self.getValueFromBetween(dataUnit,
+                                 nameMarker, nameEnd)
+                    players.append((playerName,
+                                    (currentClanID, currentClanName)))
+                    currentClanID = None
+                    currentClanName = ""
             ratingRange = dataPoint.split("<td>")[-1]
-            teamRating = self.getIntegerValue(rankingRange, "")
+            if len(ratingRange) < 1 or type(ratingRange[0]) != int:
+                teamRating = 0
+            else:
+                teamRating = self.getIntegerValue(ratingRange, "")
             teams.append((teamID, teamRank, rankShift, teamRating,
                           players))
         return teams

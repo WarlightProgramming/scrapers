@@ -44,11 +44,18 @@ if __name__ == "__main__":
 			              clanMedian, clanPct)
 	for clanName in clanData:
 		clanInfo = clanData[clanName]
+		clanWins = clanInfo[1]
+		clanGames = clanInfo[2]
+		clanPeak = clanInfo[3]
+		clanTrough = clanInfo[4]
+		clanAvg = clanInfo[5]
+		clanMedian = clanInfo[6]
+		clanPct = clanInfo[7]
 		clanString = (clanName + ": " + str(clanWins) + " wins across "
 			          + str(clanGames) + " games by " + str(clanCount)
 			          + " players (best percentage: " + str(clanPeak) +
 			          "; worst percentage: " + str(clanTrough) +
 			          "; average percentage: " + str(clanAvg) +
 			          "; median percentage: " + str(clanMedian) +
-			          "; overall percentage: " + str(clanPct))
+			          "; overall percentage: " + str(clanPct)) + ")"
 		print clanString

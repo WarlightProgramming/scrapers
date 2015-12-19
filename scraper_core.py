@@ -15,9 +15,11 @@ class ContentError(Exception):
 
 class WLScraper(object):
 
-    def __init__(self):
+    def __init__(self, baseURL=None, **kwargs):
         self.baseURL = "https://www.warlight.net/"
-        self.URL = self.makeURL()
+        if baseURL is not None:
+            self.baseURL = baseURL
+        self.URL = self.makeURL(**kwargs)
 
     def makeURL(self, **kwargs):
         URL = self.baseURL
@@ -44,8 +46,10 @@ class WLScraper(object):
     def getValueFromBetween(text, before, after):
         if before is None: before = ""
         if after is None: after = ""
-        if (before not in text or after not in text):
-            raise ContentError("Missing marker!")
+        if (before not in text):
+            raise ContentError("Missing 'before' marker!")
+        if (after not in text):
+            raise ContentError("Missing 'after' marker!")
         beforeLoc = text.find(before) + len(before)
         value = text[beforeLoc:]
         if (after == ""): return value
