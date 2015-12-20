@@ -79,13 +79,14 @@ class LadderRankingScraper(WLScraper):
                     currentClanID = self.getIntegerValue(dataUnit, clanIDMarker)
                     currentClanName = self.getValueFromBetween(dataUnit,
                                       clanNameMarker, clanNameEnd)
-                else:
+                elif nameMarker in dataUnit and nameEnd in dataUnit:
                     playerName = self.getValueFromBetween(dataUnit,
                                  nameMarker, nameEnd)
                     players.append((playerName,
                                     (currentClanID, currentClanName)))
                     currentClanID = None
                     currentClanName = ""
+                else: continue
             ratingRange = dataPoint.split("<td>")[-1]
             if len(ratingRange) < 1 or type(ratingRange[0]) != int:
                 teamRating = 0

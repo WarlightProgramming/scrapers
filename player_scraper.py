@@ -8,14 +8,32 @@ class PlayerScraper(WLScraper):
         self.URL = self.makeURL(p=playerID)
 
     @getPageData
+    def playerExists(self):
+        page = self.pageData
+        marker = "Sorry, the requested player was not found."
+        return (marker not in page)
+
+    @getPageData
     def getClanID(self):
         page = self.pageData
-        return self.getIntegerValue(page, '<a href="/Clans/?ID=')
+        marker = '<a href="/Clans/?ID='
+        if marker not in page: return None
+        return self.getIntegerValue(page, marker)
+
+    @getPageData
+    def getLocation(self):
+        page = self.pageData
+        marker = 'title="Plays from '
+        end = '"'
+        if marker not in page: return ""
+        return self.getValueFromBetween(page, marker, end)
 
     @getPageData
     def getClanName(self):
         page = self.pageData
-        return self.getLetterValue(page, 'border="0" />')
+        marker = 'border="0" />'
+        if marker not in page: return ""
+        return self.getLetterValue(page, marker)
 
     @getPageData
     def getPlayerName(self):
@@ -130,6 +148,7 @@ class PlayerScraper(WLScraper):
     @getPageData
     def getBootRate(self):
         page = self.pageData
+        if "never been booted" in page: return 0.0
         marker = "This player has been booted "
         end = "</font>"
         dataRange = self.getValueFromBetween(page, marker, end)
