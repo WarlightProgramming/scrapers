@@ -131,12 +131,16 @@ class PlayerScraper(WLScraper):
         return self.getNumericValue(dataRange, " (")
 
     @getPageData
-    def getLastSeen(self):
+    def getLastSeenString(self):
         page = self.pageData
         marker = "Last seen </font>"
         end = "<font"
-        return self.timeConvert(self.getValueFromBetween(page,
-                                marker, end))
+        return self.getValueFromBetween(page,
+                                        marker, end)
+
+    @getPageData
+    def getLastSeen(self):
+        return self.timeConvert(self.getLastSeenString())
 
     @getPageData
     def getBootCount(self):

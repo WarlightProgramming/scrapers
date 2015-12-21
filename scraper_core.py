@@ -2,12 +2,33 @@ import requests
 import string
 from decimal import Decimal
 import datetime
+from BeautifulSoup import BeautifulSoup
 
 def getPageData(func):
     def func_wrapper(self, *args):
         if (not(hasattr(self, 'pageData'))):
             self.getData()
         return func(self, *args)
+    return func_wrapper
+
+def reformatHTML(func):
+    def func_wrapper(*args):
+        output = func(*args)
+        if hasattr(output, '__iter__'):
+            retoreTuple = False
+            if (type(output) == tuple): 
+                output = list(output)
+                restoreTuple = True
+            for x in xrange(len(output)):
+                if (type(output[x]) == str or type(output[x]) == unicode):
+                    output[x] = BeautifulSoup(output[x],
+                                convertEntities=BeautifulSoup.\
+                                HTML_ENTITIES)
+            if restoreTuple: output = tuple(output)
+        elif (type(output) == str or type(output) == unicode):
+            output = BeautifulSoup(output, convertEntities=BeautifulSoup.\
+                                   HTML_ENTITIES)
+        return output
     return func_wrapper
 
 class ContentError(Exception):
@@ -57,7 +78,7 @@ class WLScraper(object):
         if (after == ""): return value
         afterLoc = value.find(after)
         value = value[:afterLoc]
-        return value
+        return value.encode('ascii', 'ignore')
 
     @staticmethod
     def getTypedValue(text, marker, typeRange, check=True):
@@ -72,7 +93,7 @@ class WLScraper(object):
             text = text[1:]
         if (check and (len(data) == 0)):
             raise ContentError("No content in specified range!")
-        return data
+        return data.encode('ascii', 'ignore')
 
     def getNumericValue(self, text, marker):
         return float(self.getTypedValue(text, marker, 

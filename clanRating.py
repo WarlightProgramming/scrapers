@@ -77,7 +77,7 @@ def getScore(playerScraper):
     return score
 
 def printRanked(data, index=1):
-    counter = 1
+    counter = 0
     offset = 0
     previous = None
     for dataPoint in data:
@@ -86,8 +86,9 @@ def printRanked(data, index=1):
         else:
             counter += offset + 1
             offset = 0
+            previous = dataPoint[index]
         print (str(counter) + ". " +
-               str(dataPoint[0]) + ": " +
+               unicode(dataPoint[0]) + ": " +
                str(dataPoint[1]) + " points")
 
 if __name__ == "__main__":
@@ -112,7 +113,7 @@ if __name__ == "__main__":
     for clanName in clanData:
         data = clanData[clanName]
         length = len(data)
-        print ("Ranked " + str(length) + " members in " + str(clanName))
+        print ("Ranked " + str(length) + " members in " + unicode(clanName))
         print "   "
         printRanked(data)
         print "============"

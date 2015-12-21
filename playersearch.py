@@ -6944,12 +6944,17 @@ def getQualifiedPlayers(minRates, maxBoot, minPoints):
     # playerSet = getAllPlayers()
     playerSet = getPlayerSet()
     qualifiedPlayers = set()
+    size = len(playerSet)
+    counter = 0
     for player in playerSet:
+        if counter % 100 == 0:
+            print counter, size
+        counter += 1
         ps = PlayerScraper(player)
         points = ps.getPoints()
         bootRate = ps.getBootRate()
         rankedData = ps.getRankedData()[0]
-        if ps.getClanID() is not None: continue
+        # if ps.getClanID() is not None: continue
         if points < minPoints: continue
         if bootRate > maxBoot: continue
         failure = False
