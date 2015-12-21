@@ -6960,6 +6960,9 @@ def getQualifiedPlayers(minRates, maxBoot, minPoints):
                 if winRate < minRate:
                     failure = True
                     break
+            else:
+                failure = True
+                break
         if failure:
             continue
         qualifiedPlayers.add(player)
@@ -6970,9 +6973,9 @@ def getQualifiedPlayers(minRates, maxBoot, minPoints):
 if __name__ == "__main__":
     requests.packages.urllib3.disable_warnings()
     minRates = dict()
-    minRates['1v1'] = 45
-    minRates['2v2'] = 40
-    minRates['3v3'] = 40
-    players = getQualifiedPlayers(minRates, 10, 100000)
+    minRates['1v1'] = 65
+    minRates['2v2'] = 60
+    minRates['3v3'] = 60
+    players = getQualifiedPlayers(minRates, 8, 200000)
     for player in players:
         print ("https://www.warlight.net/Profile?p=" + str(player))

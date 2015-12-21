@@ -47,9 +47,11 @@ class WLScraper(object):
         if before is None: before = ""
         if after is None: after = ""
         if (before not in text):
-            raise ContentError("Missing 'before' marker!")
+            raise ContentError("Missing 'before' marker: " + before +
+                               " in " + text)
         if (after not in text):
-            raise ContentError("Missing 'after' marker!")
+            raise ContentError("Missing 'after' marker! " + after +
+                               " in " + text)
         beforeLoc = text.find(before) + len(before)
         value = text[beforeLoc:]
         if (after == ""): return value
@@ -60,7 +62,8 @@ class WLScraper(object):
     @staticmethod
     def getTypedValue(text, marker, typeRange, check=True):
         if marker not in text:
-            raise ContentError("Missing marker!")
+            raise ContentError("Missing marker: " + marker + " in " +
+                               text)
         loc = text.find(marker) + len(marker)
         text = text[loc:]
         data = ""
@@ -73,11 +76,11 @@ class WLScraper(object):
 
     def getNumericValue(self, text, marker):
         return float(self.getTypedValue(text, marker, 
-                                        (string.digits + ".")))
+                                        (string.digits + ".+-")))
 
     def getIntegerValue(self, text, marker):
         return int(self.getTypedValue(text, marker,
-                                      string.digits))
+                                      (string.digits + "-+")))
 
     def getLetterValue(self, text, marker):
         return self.getTypedValue(text, marker, (string.ascii_lowercase

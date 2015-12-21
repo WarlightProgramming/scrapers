@@ -38,7 +38,7 @@ class PlayerScraper(WLScraper):
     @getPageData
     def getPlayerName(self):
         page = self.pageData
-        return self.getLetterValue(page, '<title>')
+        return self.getValueFromBetween(page, '<title>', ' -')
 
     @getPageData
     def getMemberStatus(self):

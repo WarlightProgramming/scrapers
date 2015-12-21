@@ -12,7 +12,11 @@ def getQualifiedPlayers(playerSet, minRates, maxBoot, minPoints):
         existence = ps.playerExists()
         if not existence: continue
         existing += 1
-        points = ps.getPoints()
+        try:
+            points = ps.getPoints()
+        except:
+            print "failure at", player
+            points = ps.getPoints()
         bootRate = ps.getBootRate()
         rankedData = ps.getRankedData()[0]
         clanID = ps.getClanID()
@@ -38,7 +42,7 @@ def getQualifiedPlayers(playerSet, minRates, maxBoot, minPoints):
 
 if __name__ == "__main__":
     requests.packages.urllib3.disable_warnings()
-    playerSet = xrange(1000000, 10000000000)
+    playerSet = xrange(10000000, 10000000000)
     minRates = dict()
     minRates['1v1'] = 50
     minRates['2v2'] = 50

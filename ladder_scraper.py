@@ -103,31 +103,48 @@ class LadderHistoryScraper(WLScraper):
         self.URL = self.makeURL(ID=ladderID, Offset=offset)
         self.isEmpty = False
         self.earliestTime = None
+        self.gameMarker = '<tr style="background-color: inherit">'
 
     @getPageData
     def getGameHistory(self):
         page = self.pageData
         games = list()
         marker = "</thead>"
-        end = "</table>"
+        end = '<div class="LadderGamesPager'
         dataRange = self.getValueFromBetween(page, marker, end)
-        gameMarker = '<tr style="background-color: inherit">'
+        gameMarker = self.gameMarker
         if gameMarker not in dataRange: 
             self.isEmpty = True
             return games
         dataSet = dataRange.split(gameMarker)[1:]
         for dataPoint in dataSet:
+            multiMarker = 'MultiPlayer?GameID='
             gameID = self.getIntegerValue(dataPoint,
-                     'href="MultiPlayer?GameID=')
+                                          multiMarker)
             gameTime = self.getValueFromBetween(dataPoint,
                        'style="white-space: nowrap">',
                        '</td>')
-            gameTime = self.getDateTime(gameTime)
-            winnerData, loserData = dataPoint.split("defeated")
-            winningTeam = self.getIntegerValue(winnerData,
-                          '?LadderTeamID=')
-            losingTeam = self.getIntegerValue(loserData,
-                         '?LadderTeamID=')
-            games.append((gameID, gameTime, winningTeam, losingTeam))
+            if gameTime == "": gameTime = None
+            else: gameTime = self.getDateTime(gameTime)
+            if "defeated" in dataPoint:
+                alphaData, betaData = dataPoint.split("defeated")
+                finished = True
+            else:
+                alphaData, betaData = dataPoint.split(" vs ")
+                finished = False
+            alphaTeam = self.getIntegerValue(alphaData,
+                        '?LadderTeamID=')
+            betaTeam = self.getIntegerValue(betaData,
+                       '?LadderTeamID=')
+            games.append((gameID, gameTime, alphaTeam, betaTeam, finished))
             self.earliestTime = gameTime
         return games
+
+class LadderTeamHistoryScraper(LadderHistoryScraper):
+
+    def __init__(self, ladderID, teamID, offset):
+        self.baseURL = "https://www.warlight.net/LadderGames?"
+        self.URL = self.makeURL(ID=ladderID, LadderTeamID=teamID, Offset=offset)
+        self.isEmpty = False
+        self.earliestTime = None
+        self.gameMarker = '<tr style="background-color: '
