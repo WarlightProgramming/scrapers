@@ -297,7 +297,7 @@ class PlayerScraper(WLScraper):
             avgString = self.getValueFromBetween(markedRange,
                         "Average:</font> ", "<br />")
             avgTime = self.timeConvert(avgString)
-            data[typeMarker] = avgTime
+            data[typeMarker[:-1]] = avgTime
         return data
 
     @getPageData

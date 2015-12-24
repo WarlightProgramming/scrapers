@@ -60,17 +60,26 @@ if __name__ == "__main__":
                                 / Decimal(size)), 2)
         clanData[clanName] = (playerDataList, percent14, percent30, inactives14,
                               inactives30)
+    clanDataList = list()
     for clanName in clanData:
-        data = clanData[clanName][0]
-        percent14 = clanData[clanName][1]
-        percent30 = clanData[clanName][2]
-        inactives14 = clanData[clanName][3]
-        inactives30 = clanData[clanName][4]
+        clanDataList.append((clanName, clanData[clanName]))
+    for clan in clanDataList:
+	clanName = clan[0]
+	clanInfo = clan[1]
+	data = clanInfo[0]
+        percent14 = clanInfo[1]
+        percent30 = clanInfo[2]
+        inactives14 = clanInfo[3]
+        inactives30 = clanInfo[4]
+        i14s = " players ("
+        i30s = " players ("
+        if inactives14 == 1: i14s = " player ("
+        if inactives30 == 1: i30s = " player ("
         length = len(data)
         print ("Ranked " + str(length) + " inactive members in " +
                unicode(clanName))
-        print (str(inactives14) + "players (" + str(percent14) +
-               "%) inactive for 14+ days; " + str(inactives30) + "players (" +
+        print (str(inactives14) + i14s + str(percent14) +
+               "%) inactive for 14+ days; " + str(inactives30) + i30s +
                str(percent30) + "%) "
                "inactive for 30+ days")
         print "   "

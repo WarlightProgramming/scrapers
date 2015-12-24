@@ -78,7 +78,7 @@ class WLScraper(object):
         if (after == ""): return value
         afterLoc = value.find(after)
         value = value[:afterLoc]
-        return value.encode('ascii', 'ignore')
+        return value
 
     @staticmethod
     def getTypedValue(text, marker, typeRange, check=True):
@@ -93,7 +93,7 @@ class WLScraper(object):
             text = text[1:]
         if (check and (len(data) == 0)):
             raise ContentError("No content in specified range!")
-        return data.encode('ascii', 'ignore')
+        return data
 
     def getNumericValue(self, text, marker):
         return float(self.getTypedValue(text, marker, 
